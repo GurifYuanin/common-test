@@ -4,9 +4,17 @@
 	<meta charset="UTF-8">
 	<title>commonJS</title>
 	<link rel="stylesheet" href="css/normalize.css">
+	<link rel="stylesheet" href="css/book_style.css">
 </head>
 <body>
-	<h2>定义</h2>
+	<div class="container">
+		<!-- 文章头 -->
+	<img class = "titleImg" src="images/commonJS.png" alt="加载失败">
+	<!-- 文章主体 -->
+	<h2>
+		<img src="images/定义.png" alt="加载失败">
+		定义
+	</h2>
 	<p>
 		<cite>
 			CommonJS is a project with the goal of specifying an ecosystem for JavaScript outside the browser (for example, on the server or for native desktop applications).
@@ -19,27 +27,36 @@
 		commonJS API也提供了一些普通的应用程序可以使用的API。</div>
 
 		<div>用容易理解的方式表达，以往引用其他文件的方式为</div>
-		<div>"&lt;script src='要引用的文件.js'&gt;"</div>
-		<div>但这种方法会导致变量名重复的问题，例如A文件定义了一个length变量，B文件同样也定义了该变量，如果执行</div>
-		<div>"&lt;script src='A.js'&gt;"</div>
-		<div>"&lt;script src='B.js'&gt;"</div>
+		<pre>
+			&lt;script src='要引用的文件.js'&gt;</pre>
+		<div>但这种方法会导致变量名重复等问题，例如A文件定义了一个length变量，B文件同样也定义了该变量，如果执行</div>
+		<pre>
+			&lt;script src='A.js'&gt;
+			&lt;script src='B.js'&gt;</pre>
 		<div>后来引用的B文件会覆盖了A文件定义的length变量，commonJS则解决了这个问题。</div>
 	</p>
 
 
-	<h2>历史</h2>
+	<h2>
+		<img src="images/历史.png" alt="加载失败">
+		历史
+	</h2>
 	<p>
 		<div>2009年1月，Mozilla开创并将它命名为ServerJS。</div>
 		<div>2009年8月，ServerJS重命名为CommonJS并公布了许多可应用的API。</div>
 		<div>2009年Ryan Dahl写成的Node.js就是对CommonJS的一种实现。</div>
 	</p>
 
-	<h2>原理</h2>
+	<h2>
+		<img src="images/原理.png" alt="加载失败">
+		原理
+	</h2>
 	<p>
-		<div>以下实例在Node.js环境下运行）</div>
-		<div>每个js文件本身有一个module对象（通过对Node提供的Module构造函数进行实例化得到），在模块中可以用使用module.exports来构建模块，我们可以创建一个文件对module进行输出，来查看module对象的所有属性。</div>
+		<div>（以下实例在Node.js环境下运行）</div>
+		<div>每个js文件本身自带一个module对象（通过对Node提供的Module构造函数进行实例化得到），在模块中可以用使用module对象的exports属性来构建模块。我们可以创建一个文件然后对module进行输出，来查看module对象的所有属性。</div>
 		<div>这里创建一个module_attributes.js文件，里面只写了一行代码</div>
-		<pre>console.log(module);</pre>
+		<pre>
+			console.log(module);</pre>
 		运行结果：
 		<pre>
 			Module {
@@ -53,8 +70,7 @@
 			   [ 'D:\\Git\\common-test\\js\\node_modules',
 			     'D:\\Git\\common-test\\node_modules',
 			     'D:\\Git\\node_modules',
-			     'D:\\node_modules' ] }
-		</pre>
+			     'D:\\node_modules' ] }</pre>
 		<div>id：模块的标识符</div>
 		<div>exports：其他文件通过require命令调用当前模块后，返回的对象</div>
 		<div>parent：调用当前模块的模块</div>
@@ -63,44 +79,47 @@
 		<div>children：当前模块调用的模块</div>
 		<div>可以看到，module其实就是描述当前js文件的一个对象，也可以直接理解为module就是js文件自身。</div>
 		<div>在调用其他模块时，只需要</div>
-		<pre>require('要调用的模块')</pre>
-		该命令会返回被调用模块的exports对象，也就是说可以先为exports对象添加属性和方法，require后就可以使用被调用模块的exports对象的属性和方法。
+		<pre>
+			require('要调用的模块');</pre>
+		该命令会返回被调用模块的exports对象，也就是说可以在文件中先为exports对象添加属性和方法，require后就可以使用被调用模块的exports对象的属性和方法。
 		<div>例如，假设被调用的模块为add.js，功能为两数相加和，进行调用的模块为index.js</div>
-		add.js代码
+		add.js代码：
 		<pre>
 			module.exports.add = function (a, b) {
 				return a + b;
-			}
-		</pre>
-		index.js代码
+			}</pre>
+		index.js代码：
 		<pre>
 			var mod = require('./add.js');
 			var sum = mod.add(1, 2);
-			console.log(sum);
-		</pre>
-		<div>执行结果</div>
-		<pre>3</pre>
-		<div>运行index.js，执行require后会返回add.js里的exports对象，此时exports对象已经添加了add函数，所以我们可以使用该函数。（require默认加载javascript文件，因此当加载的文件是js格式时，可以省略文件后缀）</div>
-		<div>为了在模块内方便给module.exports对象添加属性和方法，每个模块还有一个exports变量，该变量其实就是module.exports，相当于在每个模块代码最前面运行了</div>
-		<pre>var exports = module.exports</pre>
-		<div>由于调用时返回的是module.exports而不是exports，因此<b>不应该对exports进行直接赋值</b>。</div>
-		<div>这是因为，exports是个对象，js中在使用对象的时候是使用指针（指针的概念见<a href="#">[还没建设好]</a>），例如</div>
+			console.log(sum);</pre>
+		<div>执行index.js，执行结果：</div>
 		<pre>
-			var a = {};
-		</pre>
+			3</pre>
+		<div>运行index.js，执行require后会返回add.js里的exports对象，也就是这个东西：</div>
+		<pre>
+			{
+				add: function(a, b) {
+					return a + b;
+				}
+			}</pre>
+		<div>此时exports对象已经添加了add函数，所以我们可以使用该函数。（require默认加载javascript文件，因此当加载的文件是js格式时，可以省略文件后缀）</div>
+		<div>为了在模块内方便给module.exports对象添加属性和方法，每个模块还有一个exports变量，该变量等价于module.exports，相当于在每个模块代码最前面自动运行了：</div>
+		<pre>
+			var exports = module.exports</pre>
+		<div>由于调用时返回的是module.exports而不是exports，因此<b>不应该对exports进行直接赋值</b>。因为，exports是个对象，js中在调用对象的时候是使用指针，例如：</div>
+		<pre>
+			var a = {};</pre>
 		<div>此时的a是一个指向"{}"所在内存空间首地址的指针变量，如果我们对a进行一些操作</div>
 		<pre>
-			a.length = 10;
-		</pre>
+			a.length = 10;</pre>
 		<div>这个时候p会访问"{}"所在的内存空间，然后开辟一个8字节大小的空间并写入10这个数字，其他创建新属性操作同理。</div>
 		<div>因此，如果把一个对象赋值给另一个对象，实际上复制的是内存空间起始位置，而不是对数据的复制。</div>
 		<pre>
-			var b = a; // b现在和a都是指向"{length: 10}"的变量
-		</pre>
+			var b = a; // b现在和a都是指向"{length: 10}"的变量</pre>
 		<div>把b类比为exports，a类比为module.exports，如果对exports进行直接赋值操作，例如</div>
 		<pre>
-			b = 10;
-		</pre>
+			b = 10;</pre>
 		<div>那么b就变成了整型数字10，a已经指向"{length: 10}"，a和b已经不等同了。</div>
 	</p>
 	<p>
@@ -111,11 +130,13 @@
 			delete require.cache['模块名']; // 删除指定模块缓存
 			Object.keys(require.cache).forEach(function(key) { // 删除所有模块缓存
 			  delete require.cache[key];
-			})
-		</pre>
+			})</pre>
 	</p>
 
-	<h2>缺点</h2>
+	<h2>
+		<img src="images/缺点.png" alt="加载失败">
+		缺点
+	</h2>
 	<p>
 		对于服务器端，本地加载模块基本上不需要考虑速度，但对于客户端，由于commonJS是以<b>同步机制</b>加载模块，容易造成资源加载阻塞的现象（浏览器假死）。
 	</p>
@@ -127,5 +148,6 @@
 		<div>[1]wikipedia CommonJS https://en.wikipedia.org/wiki/CommonJS</div>
 		<div>[2]阮一峰 CommonJS规范 http://javascript.ruanyifeng.com/nodejs/module.html</div>
 	</p>
+	</div>
 </body>
 </html>
